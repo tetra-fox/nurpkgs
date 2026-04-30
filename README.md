@@ -7,15 +7,18 @@
 
 ## Usage
 
-Add as a flake input:
+First, add as a flake input
 
 ```nix
-inputs.nurpkgs.url = "github:tetra-fox/nurpkgs";
+inputs = {
+  tetra-nurpkgs = {
+    url = "github:tetra-fox/nurpkgs";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+};
 ```
 
-Then either the overlay or `legacyPackages.<system>` can be used.
-
-**Via overlay** (in a NixOS or home-manager module):
+### As an overlay
 
 ```nix
 { inputs, ... }: {
@@ -23,7 +26,7 @@ Then either the overlay or `legacyPackages.<system>` can be used.
 }
 ```
 
-**Via direct reference** (skip the overlay):
+### Directly
 
 ```nix
 environment.systemPackages = [
