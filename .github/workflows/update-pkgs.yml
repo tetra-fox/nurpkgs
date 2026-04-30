@@ -1,0 +1,49 @@
+name: Update packages
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday at 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    name: Update ${{ matrix.package }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        package:
+          - apple-color-emoji
+          - surge-dm
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v34
+
+      - name: Update package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NIX_PATH: nixpkgs=flake:nixpkgs
+        run: nix run nixpkgs#nix-update -- --flake --use-update-script ${{ matrix.package }}
+
+      # https://github.com/actions/checkout#push-a-commit-using-the-built-in-token
+      - name: Commit changes
+        run: |
+          dir="pkgs/${{ matrix.package }}"
+          if git diff --quiet HEAD -- "$dir"; then
+            echo "$dir unchanged, skipping commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$dir"
+          git commit -m "chore(pkgs): bump ${{ matrix.package }}"
+          git push
