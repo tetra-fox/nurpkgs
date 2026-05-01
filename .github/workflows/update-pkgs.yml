@@ -29,21 +29,29 @@ jobs:
         uses: nixbuild/nix-quick-install-action@v34
 
       - name: Update package
+        id: update
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NIX_PATH: nixpkgs=flake:nixpkgs
-        run: nix run nixpkgs#nix-update -- --flake --use-update-script ${{ matrix.package }}
+        run: |
+          pkg="${{ matrix.package }}"
+          old=$(nix eval --raw ".#$pkg.version")
+          nix run nixpkgs#nix-update -- --flake --use-update-script "$pkg"
+          new=$(nix eval --raw ".#$pkg.version")
+          echo "old=$old" >> "$GITHUB_OUTPUT"
+          echo "new=$new" >> "$GITHUB_OUTPUT"
+          if git diff --quiet HEAD -- "pkgs/$pkg"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       # https://github.com/actions/checkout#push-a-commit-using-the-built-in-token
       - name: Commit changes
+        if: steps.update.outputs.changed == 'true'
         run: |
-          dir="pkgs/${{ matrix.package }}"
-          if git diff --quiet HEAD -- "$dir"; then
-            echo "$dir unchanged, skipping commit"
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$dir"
-          git commit -m "chore(pkgs): bump ${{ matrix.package }}"
+          git add "pkgs/${{ matrix.package }}"
+          git commit -m "chore(${{ matrix.package }}): ${{ steps.update.outputs.old }} -> ${{ steps.update.outputs.new }}"
           git push
