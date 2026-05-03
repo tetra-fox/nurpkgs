@@ -10,10 +10,10 @@ buildGoModule (finalAttrs: {
   version = "0.8.5";
 
   src = fetchFromGitHub {
-    owner = "SurgeDM";
+    owner = "tetra-fox";
     repo = "Surge";
-    tag = "v${finalAttrs.version}";
-    hash = "sha256-ZQeShqNf/vhD5IoZp2grNo0YBzAObIXZIw2kQIaPKWc=";
+    rev = "eea92543c1adb94e690372cf6203c2bffd143c01";
+    hash = "sha256-bVrCHUBPOfIuOCeWp+bwZs3kVU4bJ6/1xJSTj4QwAGU=";
   };
 
   vendorHash = "sha256-XHsp2zxLOh9FB93w/g24M7II0yseOUXQGLFkX9BG96A=";
