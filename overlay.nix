@@ -2,7 +2,7 @@
 # case where you don't want to add the whole NUR namespace to your
 # configuration.
 self: super: let
-  isReserved = n: n == "lib" || n == "overlays" || n == "nixosModules" || n == "homeModules" || n == "darwinModules" || n == "flakeModules";
+  isReserved = n: builtins.elem n (import ./reserved.nix);
   nameValuePair = n: v: {
     name = n;
     value = v;

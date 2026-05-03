@@ -10,7 +10,7 @@
 # which this is possible.
 {pkgs ? import <nixpkgs> {}}:
 with builtins; let
-  isReserved = n: n == "lib" || n == "overlays" || n == "nixosModules" || n == "homeModules" || n == "darwinModules" || n == "flakeModules";
+  isReserved = n: elem n (import ./reserved.nix);
   isDerivation = p: isAttrs p && p ? type && p.type == "derivation";
   isBuildable = p: let
     licenseFromMeta = p.meta.license or [];

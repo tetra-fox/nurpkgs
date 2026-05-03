@@ -4,6 +4,7 @@
 
 - `surge-dm` — [Surge](https://github.com/SurgeDM/Surge), a TUI download manager
 - `apple-color-emoji` — Apple Color Emoji repacked for Linux (via [samuelngs/apple-emoji-ttf](https://github.com/samuelngs/apple-emoji-ttf))
+- `grafana-dashboards.*` — community dashboards from [grafana.com](https://grafana.com/grafana/dashboards/), uid-rewritten for stable provisioning
 
 ## Usage
 

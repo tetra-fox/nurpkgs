@@ -1,5 +1,5 @@
 {pkgs ? import <nixpkgs> {}}:
 pkgs.lib.packagesFromDirectoryRecursive {
-  inherit (pkgs) callPackage;
+  inherit (pkgs) callPackage newScope;
   directory = ./pkgs;
 }
