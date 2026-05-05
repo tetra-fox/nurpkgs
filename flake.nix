@@ -18,6 +18,18 @@
         nixpkgs.lib.filterAttrs (_: v: nixpkgs.lib.isDerivation v) self.legacyPackages.${system});
     overlays.default = import ./overlay.nix;
 
+    nixosModules = let
+      lib = nixpkgs.lib;
+      discovered =
+        lib.mapAttrs' (filename: _: {
+          name = lib.removeSuffix ".nix" filename;
+          value = ./modules + "/${filename}";
+        }) (lib.filterAttrs
+          (n: t: t == "regular" && lib.hasSuffix ".nix" n)
+          (builtins.readDir ./modules));
+    in
+      discovered // {default.imports = builtins.attrValues discovered;};
+
     apps = forAllSystems (system: let
       pkgs = import nixpkgs {inherit system;};
     in {

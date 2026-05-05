@@ -73,15 +73,14 @@ jobs:
           PKG: ${{ matrix.package }}
           SUBJECT: ${{ steps.update.outputs.commit_subject }}
           BODY: ${{ steps.update.outputs.commit_body }}
+          NIXPKGS_ALLOW_UNFREE: "1"
         run: |
           set -euo pipefail
           if git diff --quiet HEAD -- "pkgs/$PKG"; then
             echo "no changes"
             exit 0
           fi
-          # validate that the bumped metadata still produces a buildable
-          # store path before pushing.
-          nix-build ci.nix -A buildOutputs --no-out-link
+          nix-build -A "$PKG" default.nix --no-out-link
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 

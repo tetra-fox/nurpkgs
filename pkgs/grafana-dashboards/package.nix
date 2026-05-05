@@ -19,9 +19,6 @@
         inherit hash;
       };
 
-      # deterministic uids: upstream dashboard `uid`s may collide with other dashboards.
-      # to solve this, derive a stable, slug-keyed uid so grafana provisioning is
-      # idempotent across revision bumps and authors
       uid = builtins.substring 0 14 (builtins.hashString "sha256" slug);
     in
       runCommand "grafana-dashboard-${slug}.json" {
@@ -42,5 +39,48 @@
           | sed 's|''${DS_PROMETHEUS}|${datasource}|g' \
           > $out
       '') {};
+
+  mkDir = packages:
+    runCommand "grafana-community-dashboards" {} (''
+        mkdir -p $out
+      ''
+      + lib.concatMapStringsSep "\n" (p: ''
+        cp ${p} $out/${p.passthru.grafanaSlug}.json
+      '')
+      packages);
+
+  mkProvider = {
+    name,
+    path,
+    options ? {},
+    ...
+  } @ args:
+    {
+      type = "file";
+      updateIntervalSeconds = 60;
+      allowUiUpdates = true;
+    }
+    // (removeAttrs args ["path" "options"])
+    // {
+      inherit name;
+      options =
+        {
+          foldersFromFilesStructure = true;
+        }
+        // options
+        // {inherit path;};
+    };
+
+  mkProviders = specs:
+    map (spec:
+      if spec ? packages
+      then mkProvider (removeAttrs spec ["packages"] // {path = mkDir spec.packages;})
+      else mkProvider spec)
+    specs;
 in
-  lib.recurseIntoAttrs (lib.mapAttrs mkDashboard dashboards)
+  lib.recurseIntoAttrs (
+    lib.mapAttrs mkDashboard dashboards
+    // {
+      lib = {inherit mkDir mkProvider mkProviders;};
+    }
+  )
