@@ -7,16 +7,16 @@
 }:
 buildGoModule (finalAttrs: {
   pname = "surge-dm";
-  version = "0.8.5";
+  version = "0.8.6";
 
   src = fetchFromGitHub {
-    owner = "tetra-fox";
+    owner = "SurgeDM";
     repo = "Surge";
-    rev = "eea92543c1adb94e690372cf6203c2bffd143c01";
-    hash = "sha256-bVrCHUBPOfIuOCeWp+bwZs3kVU4bJ6/1xJSTj4QwAGU=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-o0GtuzqhCv39PRHeH1VXq4NLDgJoAQagIMlAkljY/Is=";
   };
 
-  vendorHash = "sha256-XHsp2zxLOh9FB93w/g24M7II0yseOUXQGLFkX9BG96A=";
+  vendorHash = "sha256-tXJUr/URQZC+tNq+HOIuinaqbeElJMPWQH/MG1rY80I=";
 
   # test suite is ~2min of stress tests; not worth running on every rebuild
   doCheck = false;
