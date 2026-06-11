@@ -3,7 +3,14 @@ set -euo pipefail
 
 REPO="samuelngs/apple-emoji-ttf"
 ASSET="AppleColorEmoji-Linux.ttf"
-NIX_FILE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/package.nix"
+
+# resolving via BASH_SOURCE breaks under nix-update --use-update-script,
+# which runs a store copy of this script. it does set cwd to the repo root
+NIX_FILE="pkgs/apple-color-emoji/package.nix"
+if [[ ! -f "$NIX_FILE" ]]; then
+  echo "must be run from nurpkgs repo root (looked for $NIX_FILE)" >&2
+  exit 1
+fi
 
 release=$(gh release view --repo "$REPO" --json tagName,assets)
 tag=$(jq -r '.tagName' <<<"$release")
