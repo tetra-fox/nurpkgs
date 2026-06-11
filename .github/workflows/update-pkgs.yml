@@ -21,6 +21,7 @@ jobs:
         include:
           - package: apple-color-emoji
           - package: surge-dm
+          - package: vrcx-nightly
           - package: grafana-dashboards
             command: nix run .#update-grafana-dashboards
 
