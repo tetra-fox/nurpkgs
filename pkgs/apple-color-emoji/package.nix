@@ -5,10 +5,10 @@
 }:
 stdenvNoCC.mkDerivation {
   pname = "apple-color-emoji";
-  version = "macos-26-20260219-2aa12422";
+  version = "macos-26-20260613-f1fc560b";
   src = fetchurl {
-    url = "https://github.com/samuelngs/apple-emoji-ttf/releases/download/macos-26-20260219-2aa12422/AppleColorEmoji-Linux.ttf";
-    hash = "sha256-U1oEOvBHBtJEcQWeZHRb/IDWYXraLuo0NdxWINwPUxg=";
+    url = "https://github.com/samuelngs/apple-emoji-ttf/releases/download/macos-26-20260613-f1fc560b/AppleColorEmoji-Linux.ttf";
+    hash = "sha256-uMjtl/ZCuJuko2o+CWYZ8IBdBswlrhEW5pU7mBQq4gw=";
   };
   dontUnpack = true;
   installPhase = ''
