@@ -5,6 +5,7 @@
 - `surge-dm` — [Surge](https://github.com/SurgeDM/Surge), a TUI download manager
 - `vrcx-nightly` — [VRCX](https://github.com/vrcx-team/VRCX) built from the latest master commit
 - `apple-color-emoji` — Apple Color Emoji repacked for Linux (via [samuelngs/apple-emoji-ttf](https://github.com/samuelngs/apple-emoji-ttf))
+- `rainbow-dash-hyprcursor` — hyprcursor build of [kirigakurenohaku's Rainbow Dash cursor pack](https://www.deviantart.com/kirigakurenohaku/art/Rainbow-Dash-Cursor-Set-Standard-Orientation-282922779); the original `.ani` files are bundled and converted at build time. Installs to `share/icons/Rainbow-Dash`
 - `grafana-dashboards.*` — community dashboards from [grafana.com](https://grafana.com/grafana/dashboards/), uid-rewritten for stable provisioning, `.override`-able datasource. Bundling helpers live in `pkgs.grafana-dashboards.lib.*`. See [`pkgs/grafana-dashboards/README.md`](./pkgs/grafana-dashboards/README.md).
 
 ## NixOS modules
@@ -66,4 +67,4 @@ nix build github:tetra-fox/nurpkgs#surge-dm
 ```
 
 > [!IMPORTANT]
-> `apple-color-emoji` is `unfreeRedistributable`. You'll need `allowUnfree` (or a predicate) on your nixpkgs config.
+> `apple-color-emoji` and `rainbow-dash-hyprcursor` are `unfreeRedistributable` (the latter is built on Hasbro IP). You'll need `allowUnfree` (or a predicate) on your nixpkgs config.
