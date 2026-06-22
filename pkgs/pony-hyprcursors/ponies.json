@@ -1,0 +1,67 @@
+{
+  "Rainbow-Dash": {
+    "src": "Rainbow-Dash",
+    "description": "Rainbow Dash animated hyprcursor theme (standard orientation)",
+    "homepage": "https://www.deviantart.com/sullindir/art/Rainbow-Dash-Cursor-Set-Standard-Orientation-287789499"
+  },
+  "Rainbow-Dash-Alternate": {
+    "src": "Rainbow-Dash-Alternate",
+    "description": "Rainbow Dash animated hyprcursor theme (mirrored, points the opposite way)",
+    "homepage": "https://www.deviantart.com/sullindir/art/Rainbow-Dash-Cursor-Set-276556370"
+  },
+  "Applejack": {
+    "src": "Applejack",
+    "description": "Applejack animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Applejack-Cursor-Set-278956284"
+  },
+  "Fluttershy": {
+    "src": "Fluttershy",
+    "description": "Fluttershy animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Fluttershy-Cursor-Set-267274999"
+  },
+  "Pinkie-Pie": {
+    "src": "Pinkie-Pie",
+    "description": "Pinkie Pie animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Pinkie-Pie-Cursor-Set-263252229"
+  },
+  "Rarity": {
+    "src": "Rarity",
+    "description": "Rarity animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Rarity-Cursor-Set-272432611"
+  },
+  "Twilight-Sparkle": {
+    "src": "Twilight-Sparkle",
+    "description": "Twilight Sparkle animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Twilight-Sparkle-Cursor-Set-269952089"
+  },
+  "Princess-Luna": {
+    "src": "Princess-Luna",
+    "description": "Princess Luna animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Princess-Luna-Cursor-Set-321959433"
+  },
+  "Octavia": {
+    "src": "Octavia",
+    "description": "Octavia animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Octavia-Cursor-Set-319260648"
+  },
+  "Derpy-Hooves": {
+    "src": "Derpy-Hooves",
+    "description": "Derpy Hooves (Ditzy Doo) animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Ditzy-Doo-Cursor-Set-268731618"
+  },
+  "Vinyl-Scratch": {
+    "src": "Vinyl-Scratch",
+    "description": "Vinyl Scratch (DJ Pon-3) animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Vinyl-Scratch-Cursor-Set-304965988"
+  },
+  "Discord": {
+    "src": "Discord",
+    "description": "Discord animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Discord-Cursor-Set-330885490"
+  },
+  "Queen-Chrysalis": {
+    "src": "Queen-Chrysalis",
+    "description": "Queen Chrysalis animated hyprcursor theme",
+    "homepage": "https://www.deviantart.com/sullindir/art/Queen-Chrysalis-Cursor-Set-328648816"
+  }
+}

@@ -1,62 +1,62 @@
 {
-  "Dash -Normal Select-.ani": {
-    "shape": "default",
+  "default": {
+    "roles": ["Normal Select", "Normal"],
     "overrides": ["left_ptr", "arrow", "top_left_arrow"]
   },
-  "Dash -Help Select-.ani": {
-    "shape": "help",
+  "help": {
+    "roles": ["Help Select", "Help"],
     "overrides": ["left_ptr_help", "question_arrow", "whats_this"]
   },
-  "Dash -Working in Backround-.ani": {
-    "shape": "progress",
+  "progress": {
+    "roles": ["Working in Background", "Working in Backround"],
     "overrides": ["left_ptr_watch", "half-busy"]
   },
-  "Dash -Busy-.ani": {
-    "shape": "wait",
+  "wait": {
+    "roles": ["Busy"],
     "overrides": ["watch"]
   },
-  "Dash -Precision Select-.ani": {
-    "shape": "crosshair",
+  "crosshair": {
+    "roles": ["Precision Select", "Precision"],
     "overrides": ["cross", "tcross"]
   },
-  "Dash -Text Select-.ani": {
-    "shape": "text",
+  "text": {
+    "roles": ["Text Select"],
     "overrides": ["xterm", "ibeam"]
   },
-  "Dash -Handwriting-.ani": {
-    "shape": "pencil",
+  "pencil": {
+    "roles": ["Handwriting"],
     "overrides": ["draft"]
   },
-  "Dash -Unavailable-.ani": {
-    "shape": "not-allowed",
+  "not-allowed": {
+    "roles": ["Unavailable"],
     "overrides": ["forbidden", "crossed_circle"]
   },
-  "Dash -Vertical-.ani": {
-    "shape": "ns-resize",
+  "ns-resize": {
+    "roles": ["Vertical Resize", "Vertical"],
     "overrides": ["n-resize", "s-resize", "size_ver", "sb_v_double_arrow", "v_double_arrow", "double_arrow", "row-resize"]
   },
-  "Dash -Horizontal-.ani": {
-    "shape": "ew-resize",
+  "ew-resize": {
+    "roles": ["Horizontal Resize", "Horizontal", "Horizonal Resize"],
     "overrides": ["e-resize", "w-resize", "size_hor", "sb_h_double_arrow", "h_double_arrow", "col-resize"]
   },
-  "Dash -Diagonal 1-.ani": {
-    "shape": "nwse-resize",
+  "nwse-resize": {
+    "roles": ["Diagonal 1", "Diagonal Resize 1"],
     "overrides": ["nw-resize", "se-resize", "size_fdiag", "bd_double_arrow", "top_left_corner", "bottom_right_corner"]
   },
-  "Dash -Diagonal 2-.ani": {
-    "shape": "nesw-resize",
+  "nesw-resize": {
+    "roles": ["Diagonal 2", "Diagonal Resize 2"],
     "overrides": ["ne-resize", "sw-resize", "size_bdiag", "fd_double_arrow", "top_right_corner", "bottom_left_corner"]
   },
-  "Dash -Move-.ani": {
-    "shape": "move",
+  "move": {
+    "roles": ["Move"],
     "overrides": ["all-scroll", "fleur", "size_all", "grabbing", "closedhand"]
   },
-  "Dash -Alternate Select-.ani": {
-    "shape": "context-menu",
+  "context-menu": {
+    "roles": ["Alternate Select"],
     "overrides": ["right_ptr"]
   },
-  "Dash -Link Select-.ani": {
-    "shape": "pointer",
+  "pointer": {
+    "roles": ["Link Select"],
     "overrides": ["hand", "hand1", "hand2", "pointing_hand"]
   }
 }

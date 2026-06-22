@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-# Convert a directory of Windows .ani files into a hyprcursor source tree
-# (manifest.hl + hyprcursors/<shape>/{meta.hl, *.svg}) ready to be packaged
-# by `hyprcursor-util --create`.
+# Convert one pony's directory of Windows .ani files into a hyprcursor source
+# tree (manifest.hl + hyprcursors/<shape>/{meta.hl, *.svg}) ready to be
+# packaged by `hyprcursor-util --create`. roles.json maps the Windows cursor
+# role (matched off each file's "<Pony> -<Role>-.ani" name) to a freedesktop
+# shape name and its aliases; that mapping is shared across every pony.
 #
 # ANI is a RIFF('ACON') container holding N CUR frames in a LIST 'fram'
 # chunk, plus an `anih` header with frame timing in 1/60s "jiffies" and
@@ -195,12 +197,25 @@ def convert_one(ani_path: pathlib.Path, shape_dir: pathlib.Path,
     print(f"  {ani_path.name} -> {shape}/ ({len(frames)} frames @ {size}px svg)")
 
 
+def match_shape(stem: str, spellings: dict) -> str | None:
+    # DesertArcana's sets all name files "<Pony> -<Role>-.ani" (e.g.
+    # "Dash -Normal Select-"). the prefix varies per pony, so we match on the
+    # role suffix: the stem ends with "-<Spelling>-". the role wording is not
+    # consistent across sets (Normal vs Normal Select, Horizontal vs Horizontal
+    # Resize, plus a few typos), so roles.json lists every accepted spelling.
+    # match longest spelling first so "Normal Select" wins over "Normal".
+    hits = [sp for sp in spellings if stem.endswith(f"-{sp}-")]
+    if not hits:
+        return None
+    return spellings[max(hits, key=len)]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True, type=pathlib.Path,
-                    help="directory containing the input .ani files")
-    ap.add_argument("--mapping", required=True, type=pathlib.Path,
-                    help="json mapping ANI filename -> {shape, overrides}")
+                    help="directory of one pony's input .ani files")
+    ap.add_argument("--roles", required=True, type=pathlib.Path,
+                    help="json mapping shape -> {roles, overrides}")
     ap.add_argument("--out", required=True, type=pathlib.Path,
                     help="output theme source dir (will be created)")
     ap.add_argument("--name", required=True, help="theme name (manifest)")
@@ -208,17 +223,33 @@ def main() -> int:
     ap.add_argument("--version", default="1.0", help="theme version")
     args = ap.parse_args()
 
-    mapping = json.loads(args.mapping.read_text())
+    roles = json.loads(args.roles.read_text())
+    # flatten to {spelling: shape} for matching
+    spellings = {sp: shape for shape, spec in roles.items() for sp in spec["roles"]}
     cursors_dir = args.out / "hyprcursors"
     cursors_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"converting {len(mapping)} cursors -> {args.out}")
-    for ani_name, spec in mapping.items():
-        ani_path = args.src / ani_name
-        if not ani_path.exists():
-            raise SystemExit(f"missing input: {ani_path}")
-        convert_one(ani_path, cursors_dir / spec["shape"],
-                    spec["shape"], spec.get("overrides", []))
+    # match each .ani in the source dir to a shape; fail loudly on either side
+    # so a new pony whose role names differ doesn't silently drop a cursor
+    ani_for_shape: dict[str, pathlib.Path] = {}
+    for ani_path in sorted(args.src.glob("*.ani")):
+        shape = match_shape(ani_path.stem, spellings)
+        if shape is None:
+            raise SystemExit(f"{ani_path.name}: no role matches; add its spelling to roles.json")
+        if shape in ani_for_shape:
+            raise SystemExit(f"shape {shape!r} matched twice: "
+                             f"{ani_for_shape[shape].name} and {ani_path.name}")
+        ani_for_shape[shape] = ani_path
+
+    missing = set(roles) - set(ani_for_shape)
+    if missing:
+        raise SystemExit(f"{args.name}: no .ani for shapes {sorted(missing)}")
+
+    print(f"converting {len(ani_for_shape)} cursors -> {args.out}")
+    for shape, ani_path in ani_for_shape.items():
+        spec = roles[shape]
+        convert_one(ani_path, cursors_dir / shape,
+                    shape, spec.get("overrides", []))
 
     manifest = args.out / "manifest.hl"
     manifest.write_text(
