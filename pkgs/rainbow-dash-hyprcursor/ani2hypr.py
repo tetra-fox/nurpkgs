@@ -64,7 +64,8 @@ def cur_hotspot(cur: bytes) -> tuple[int, int, int, int]:
 def write_meta(path: pathlib.Path, hot_x_frac: float, hot_y_frac: float,
                size: int, frames: list[tuple[str, int]], overrides: list[str]) -> None:
     lines = [
-        "resize_algorithm = bilinear",
+        # nearest, not bilinear, so pixel-art frames stay crisp when scaled
+        "resize_algorithm = nearest",
         f"hotspot_x = {hot_x_frac:.6f}",
         f"hotspot_y = {hot_y_frac:.6f}",
     ]
