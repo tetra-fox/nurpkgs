@@ -68,8 +68,8 @@ in
     src = fetchFromGitHub {
       owner = "vrcx-team";
       repo = "VRCX";
-      rev = "f7725cbf6a6649c9882ad84d1a70160868b6d482";
-      hash = "sha256-n4zisHil3KQ0r5pg4rLvx8aNU0Wg/88dYVPis3fb84g=";
+      rev = "c3b8da42e0e5812faabe2922ddee34f2cf307dd5";
+      hash = "sha256-G3+Z9188CGNdlufIdL4QY6QMPLh4YD7dzKm7X9vm3Yg=";
     };
 
     nodejs = node;
