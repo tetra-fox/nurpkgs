@@ -63,13 +63,13 @@ in
       '';
   in {
     pname = "vrcx-nightly";
-    version = "2026.05.03-unstable-2026-07-07";
+    version = "2026.05.03-unstable-2026-07-12";
 
     src = fetchFromGitHub {
       owner = "vrcx-team";
       repo = "VRCX";
-      rev = "c3b8da42e0e5812faabe2922ddee34f2cf307dd5";
-      hash = "sha256-G3+Z9188CGNdlufIdL4QY6QMPLh4YD7dzKm7X9vm3Yg=";
+      rev = "4e12c96d72c631df305b8571caa6817b76d6e7d1";
+      hash = "sha256-cQJbpuc2mmm23PRyIZqvlARJts8iXv0EaBIPYEnjczg=";
     };
 
     nodejs = node;
