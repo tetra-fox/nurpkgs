@@ -16,8 +16,8 @@
   },
   "nvidia-gpu": {
     "id": 14574,
-    "revision": 11,
-    "hash": "sha256-0qQ+nVYZ9skOsGhpIFbTtxSkYxe7yRv6WF/56/lbgpw="
+    "revision": 12,
+    "hash": "sha256-3lNGDdHF1z/E25kPIM5E58hQ2p+ZPEsqhxH2+93CnxI="
   },
   "unpoller-uap-prometheus": {
     "id": 11314,
