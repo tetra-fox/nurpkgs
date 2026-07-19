@@ -38,4 +38,6 @@ jobs:
           purge-primary-key: never
 
       - name: Build packages
-        run: nix-build ci.nix -A buildOutputs
+        # cacheOutputs, not buildOutputs: it honors preferLocalBuild, which
+        # ableton-wine sets to keep its source wine build off the runner
+        run: nix-build ci.nix -A cacheOutputs
