@@ -6,7 +6,7 @@
   buildDotnetModule,
   dotnetCorePackages,
   nodejs_24,
-  electron_41,
+  electron_42,
   runCommand,
   unzip,
   makeWrapper,
@@ -16,10 +16,10 @@
   # package.json engines wants node >= 24, the csproj targets net9.0.
   # upstream pins electron ^40 as a devDependency (type defs + electron-builder),
   # but the runtime electron is passed explicitly to electron-builder below, so we
-  # run a supported line instead. electron 40 is EOL, 41 is the next non-insecure one.
-  # node-api-dotnet is N-API, ABI-stable across electron majors, so no addon rebuild
+  # run a supported line instead. 40 is EOL; 42 ships the same node 24.17 / N-API 10
+  # as 41 so the precompiled node-api-dotnet addon loads unchanged, just newer chromium
   node = nodejs_24;
-  electron = electron_41;
+  electron = electron_42;
   dotnet = dotnetCorePackages.dotnet_9;
 in
   buildNpmPackage (finalAttrs: let
