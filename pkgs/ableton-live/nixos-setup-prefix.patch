@@ -1,0 +1,27 @@
+--- a/scripts/setup-prefix.sh
++++ b/scripts/setup-prefix.sh
+@@ -294,7 +294,12 @@
+     tmpc=""
+     if [ -d "$root/vendor/winetricks-cache" ]; then
+         tmpc="$(mktemp -d)"
+-        ln -s "$root/vendor/winetricks-cache" "$tmpc/winetricks"
++        # the vendored cache lives in the read-only nix store; keep the cache
++        # root writable so winetricks can still download unvendored verbs (mfc42)
++        mkdir "$tmpc/winetricks"
++        for d in "$root/vendor/winetricks-cache"/*; do
++            ln -s "$d" "$tmpc/winetricks/${d##*/}"
++        done
+         export XDG_CACHE_HOME="$tmpc"
+         echo "   using bundled winetricks cache ($root/vendor/winetricks-cache)"
+     fi
+@@ -459,8 +464,8 @@
+ "$WINESERVER" -w
+ 
+ echo "== [4/5] register packaged PipeASIO =="
+-ldconfig -p 2>/dev/null | grep -F 'libpipewire-0.3.so.0' >/dev/null || \
+-  echo "!! host libpipewire-0.3.so.0 not found; install pipewire (0.3.56 or newer, 1.6+ recommended)"
++# no host libpipewire check here: the packaged pipeasio resolves it through
++# its nix store rpath, and nixos has no ld.so cache for ldconfig -p to read
+ # Pre-2026-07 runtimes shipped WineASIO; drop its registration and the stale
+ # system32 placeholders so nothing references the removed driver. Harmless on
+ # fresh prefixes.

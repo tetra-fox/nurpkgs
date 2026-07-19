@@ -7,6 +7,8 @@
 - `apple-color-emoji` — Apple Color Emoji repacked for Linux (via [samuelngs/apple-emoji-ttf](https://github.com/samuelngs/apple-emoji-ttf))
 - `pony-hyprcursors` — vectorized hyprcursor builds of [Sullindir's MLP pony cursor packs](https://www.deviantart.com/sullindir/gallery); the original `.ani` files are bundled and converted to svg pixel grids at build time. Each pony installs to `share/icons/<Name>` (Rainbow-Dash, Rainbow-Dash-Alternate, Applejack, Fluttershy, Pinkie-Pie, Rarity, Twilight-Sparkle, Princess-Luna, Octavia, Derpy-Hooves, Vinyl-Scratch, Discord, Queen-Chrysalis); pick one with `hyprctl setcursor <Name> <size>`
 - `grafana-dashboards.*` — community dashboards from [grafana.com](https://grafana.com/grafana/dashboards/), uid-rewritten for stable provisioning, `.override`-able datasource. Bundling helpers live in `pkgs.grafana-dashboards.lib.*`. See [`pkgs/grafana-dashboards/README.md`](./pkgs/grafana-dashboards/README.md).
+- `ableton-wine` — Wine 11.11 (giang17 d2d1-dcomp fork) with the [shibco/ableton-linux](https://github.com/shibco/ableton-linux) patch series and PipeASIO, built from source with the upstream build gates ported as assertions
+- `ableton-live` — launcher and prefix setup for Ableton Live on `ableton-wine`. See [`pkgs/ableton-live/README.md`](./pkgs/ableton-live/README.md).
 
 ## NixOS modules
 
