@@ -42,8 +42,9 @@ in
       hash = "sha256-0x5VuWJg4F0IyyRXsZ1rEZqN49DW6i6GzTYcEepERjs=";
     };
 
-    # keep nixpkgs' own patches (cert-path); the series applies after, globbed
-    # from the kit at build time so this file never restates the series.
+    # keep nixpkgs' own patches (cert-path); the series applies after, driven
+    # by the kit's SERIES.sha256 manifest so this file never restates it and a
+    # kit whose patches disagree with the manifest fails instead of building.
     # upstream uses git am --3way, but on the exact base plain patch works:
     # the series carries no renames or binary diffs, and 0032 patches the
     # generated configure alongside configure.ac so no autoreconf is needed
@@ -54,13 +55,39 @@ in
           echo "kit VERSION $(cat ${abletonLinux}/VERSION) does not match package version $version" >&2
           exit 1
         }
+        (cd ${abletonLinux}/patches && sha256sum -c --quiet SERIES.sha256)
+        for f in ${abletonLinux}/patches/00*.patch ${abletonLinux}/patches/pipeasio/*.patch; do
+          rel=''${f#${abletonLinux}/patches/}
+          grep -q "  $rel\$" ${abletonLinux}/patches/SERIES.sha256 || {
+            echo "$rel on disk but not in SERIES.sha256" >&2
+            exit 1
+          }
+        done
         n=0
-        for p in ${abletonLinux}/patches/00*.patch; do
-          patch -p1 --no-backup-if-mismatch < "$p"
+        for p in $(sed -n 's/^[0-9a-f]\{64\}  \(00.*\.patch\)$/\1/p' ${abletonLinux}/patches/SERIES.sha256); do
+          patch -p1 --no-backup-if-mismatch < ${abletonLinux}/patches/$p
           n=$((n + 1))
         done
         echo "applied $n patches from the ableton-linux series"
       '';
+
+    # fail two minutes in, not after the full compile: configure silently
+    # drops ntsync without a usable linux/ntsync.h
+    postConfigure =
+      (old.postConfigure or "")
+      + ''
+        grep -q '^#define HAVE_LINUX_NTSYNC_H 1' include/config.h
+      '';
+
+    env =
+      old.env
+      // {
+        # the kit's vendored uapi header, like upstream's container build: the
+        # dir holds only linux/ntsync.h, so system headers stay authoritative
+        # for everything else and the build stops depending on the consumer's
+        # nixpkgs kernel headers being new enough
+        CPPFLAGS = "-I${abletonLinux}/vendor/ntsync-uapi";
+      };
 
     configureFlags = old.configureFlags ++ ["--disable-tests"];
 
@@ -120,10 +147,9 @@ in
         # hardware midi in live, only "Computer Keyboard"
         test -s $out/lib/wine/x86_64-unix/winealsa.so
 
-        # configure silently drops ntsync without linux/ntsync.h; every NT sync
-        # wait then becomes a wineserver round trip (~1.3 cores with live
-        # running). check both halves, one build lost only the wineserver one
-        grep -q '^#define HAVE_LINUX_NTSYNC_H 1' include/config.h
+        # without ntsync every NT sync wait becomes a wineserver round trip
+        # (~1.3 cores with live running). check both halves, one upstream
+        # build lost only the wineserver one
         # grep -c, not -q: -q exits on first match and strings dies of SIGPIPE
         ntsync_srv="$(strings $out/bin/wineserver | grep -c ntsync || true)"
         ntsync_ntd="$(strings $out/lib/wine/x86_64-unix/ntdll.so | grep -c ntsync || true)"

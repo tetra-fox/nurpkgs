@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+command -v nix-prefetch-git >/dev/null || {
+  echo "nix-prefetch-git not on PATH (try: nix shell nixpkgs#nix-prefetch-git -c $0)" >&2
+  exit 4
+}
 
 # bumps the shibco/ableton-linux pin, and with it the giang17 wine base and
 # pipeasio version when the kit moves them. run by hand and build locally
