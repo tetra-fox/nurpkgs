@@ -68,6 +68,9 @@ echo "== starting the ableton installer — from here just click through its win
 "@abletonWine@/bin/wineserver" -w 2>/dev/null || true
 [ -z "$unpack_dir" ] || rm -rf "${XDG_CACHE_HOME:-$HOME/.cache}/ableton-wine-setup"
 
+echo "== menu entries for the installed editions =="
+"@desktopEntries@" || true
+
 cat <<EOF
 
 ================================================================

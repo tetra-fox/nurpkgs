@@ -11,6 +11,7 @@
   gawk,
   gnugrep,
   gnused,
+  icoutils,
   procps,
   unzip,
   util-linux,
@@ -40,6 +41,14 @@
     unzip
     util-linux
     wget
+  ];
+  # icon extraction plus the shell tools the entry generator uses
+  desktopEntriesPath = lib.makeBinPath [
+    coreutils
+    desktop-file-utils
+    gnugrep
+    gnused
+    icoutils
   ];
 in
   stdenvNoCC.mkDerivation {
@@ -92,11 +101,17 @@ in
       makeWrapper $share/scripts/ableton-live $out/bin/ableton-live \
         --prefix PATH : ${launcherPath}
 
+      install -m755 ${./ableton-live-desktop-entries.sh} $out/bin/ableton-live-desktop-entries
+      substituteInPlace $out/bin/ableton-live-desktop-entries \
+        --subst-var-by toolPath ${desktopEntriesPath} \
+        --subst-var-by launcher "$out/bin/ableton-live"
+
       install -m755 ${./ableton-live-setup.sh} $out/bin/ableton-live-setup
       substituteInPlace $out/bin/ableton-live-setup \
         --subst-var-by shareDir "$share" \
         --subst-var-by setupPath ${setupPath} \
-        --subst-var-by abletonWine ${ableton-wine}
+        --subst-var-by abletonWine ${ableton-wine} \
+        --subst-var-by desktopEntries "$out/bin/ableton-live-desktop-entries"
 
       # Path= would hardcode a home directory the store cannot know; the
       # launcher does not depend on its cwd

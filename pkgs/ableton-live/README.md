@@ -40,6 +40,11 @@ Ableton Live 12 under a patched Wine, no steam-run, no FHS wrapper.
    Options → Auto-Scale Plugin Window, and set Preferences → Audio →
    Driver Type: ASIO, Device: PipeASIO.
 
+`ableton-live-desktop-entries` writes one menu entry per installed edition
+(icon extracted from the exe, install pinned via `ABLETON_LIVE_EXE`); setup
+runs it automatically after the Ableton installer, rerun it after adding or
+removing editions.
+
 Live, your settings, and the license live in `~/.wine-ableton` and survive
 package updates. After an update that changes `ableton-wine`, run
 `ableton-live-setup --refresh` once: it re-applies registry policy and heals
