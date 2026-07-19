@@ -9,15 +9,15 @@
   # and its patches, winetricks plus payload cache, launcher scripts. one pin
   # shared with ableton-live via passthru. in an upstream in-tree flake this
   # becomes ./. with the version read from ./VERSION
-  version = "2026.07.19.1";
+  version = "2026.07.19.2";
   abletonLinux = fetchFromGitHub {
     owner = "shibco";
     repo = "ableton-linux";
     # main tip, not a release tag: kit content the packages ship can land
     # after the release commit that stamps VERSION. bump with update.sh and
     # build locally before pushing, CI does not build this package
-    rev = "b3ef831f874cd6988f295b6596a31eb56e9114b2";
-    hash = "sha256-+wcAgXq4sYtYhyxlqRrDgxcGqjbup/TZkLNLnO+gpb4=";
+    rev = "02498675922c5c18b7a587eff6e3d7d9af53735b";
+    hash = "sha256-GEGhY7OzdERVsY4SKGi8oqqqE7cXmZKXaOY+kW6Kqg8=";
   };
   pipeasioVersion = "1.2.2";
   pwLib = lib.getLib pipewire;
