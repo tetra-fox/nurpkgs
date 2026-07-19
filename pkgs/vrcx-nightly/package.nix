@@ -6,24 +6,23 @@
   buildDotnetModule,
   dotnetCorePackages,
   nodejs_24,
-  electron_40,
+  electron_41,
   runCommand,
   unzip,
   makeWrapper,
   makeDesktopItem,
   copyDesktopItems,
 }: let
-  # package.json engines wants node >= 24, the csproj targets net9.0,
-  # electron is pinned to ^40 in devDependencies
+  # package.json engines wants node >= 24, the csproj targets net9.0.
+  # upstream pins electron ^40 as a devDependency (type defs + electron-builder),
+  # but the runtime electron is passed explicitly to electron-builder below, so we
+  # run a supported line instead. electron 40 is EOL, 41 is the next non-insecure one.
+  # node-api-dotnet is N-API, ABI-stable across electron majors, so no addon rebuild
   node = nodejs_24;
-  electron = electron_40;
+  electron = electron_41;
   dotnet = dotnetCorePackages.dotnet_9;
 in
   buildNpmPackage (finalAttrs: let
-    # upstream nightlies stamp Version as "<date>-<short hash>", main.js
-    # treats the trailing 7 char hash as the nightly marker
-    versionStamp = "${lib.replaceStrings ["-"] ["."] (lib.last (lib.splitString "-unstable-" finalAttrs.version))}-${lib.substring 0 7 finalAttrs.src.rev}";
-
     backend = buildDotnetModule {
       inherit (finalAttrs) version src;
       pname = "${finalAttrs.pname}-backend";
@@ -63,13 +62,18 @@ in
       '';
   in {
     pname = "vrcx-nightly";
-    version = "2026.05.03-unstable-2026-07-12";
+    # upstream's nightly channel tags each build "<date>T<HH.MM>-<short hash>"
+    # (from api0.vrcx.app/releases/nightly/latest). that exact string is what
+    # the app writes to its Version file and shows as the running version, and
+    # main.js keys nightly detection off the trailing 7 char hash, so we pin the
+    # tagged nightly commit and reuse the tag verbatim. see update.sh
+    version = "2026-07-12T10.10-86bd172";
 
     src = fetchFromGitHub {
       owner = "vrcx-team";
       repo = "VRCX";
-      rev = "4e12c96d72c631df305b8571caa6817b76d6e7d1";
-      hash = "sha256-cQJbpuc2mmm23PRyIZqvlARJts8iXv0EaBIPYEnjczg=";
+      rev = "86bd17238622bf7478672f34be80354edd4b514d";
+      hash = "sha256-faMuxKl5opdM3L32erX1jH8ptnU9hb5j+zCHo7ke7Io=";
     };
 
     nodejs = node;
@@ -89,7 +93,7 @@ in
       # with those fields restored, see update.sh
       cp ${./package-lock.json} package-lock.json
 
-      echo -n "${versionStamp}" > Version
+      echo -n "${finalAttrs.version}" > Version
     '';
 
     # mirrors the linux path of upstream's own scripts: prod-linux (vite
