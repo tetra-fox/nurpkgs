@@ -25,3 +25,15 @@
  # Pre-2026-07 runtimes shipped WineASIO; drop its registration and the stale
  # system32 placeholders so nothing references the removed driver. Harmless on
  # fresh prefixes.
+@@ -493,6 +498,11 @@
+   wine reg add 'HKCU\Software\Wine\X11 Driver' \
+     /v FileDialogPortal /t REG_SZ /d auto /f
+ fi
++# this build ships wine's ffmpeg (winedmo) media backend instead of
++# winegstreamer; mfsrcsnk only uses its own sources when the gst handler is
++# disabled. without this, live cannot import mp3/aac/m4a
++# (MFCreateSourceReaderFromURL fails with MF_E_UNSUPPORTED_BYTESTREAM_TYPE)
++wine reg add 'HKCU\Software\Wine\MediaFoundation' /v DisableGstByteStreamHandler /t REG_DWORD /d 1 /f
+ push2_key='HKCU\Software\Wine\AppDefaults\Push2DisplayProcess.exe\DllOverrides'
+ wine reg add "$push2_key" /v libusb-1.0 /t REG_SZ /d builtin /f
+ wine reg query "$push2_key" /v libusb-1.0
