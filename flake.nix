@@ -19,7 +19,7 @@
     overlays.default = import ./overlay.nix;
 
     nixosModules = let
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
       discovered =
         lib.mapAttrs' (filename: _: {
           name = lib.removeSuffix ".nix" filename;

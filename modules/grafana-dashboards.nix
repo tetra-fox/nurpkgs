@@ -56,7 +56,8 @@ in {
         ++ lib.imap0 (i: path: {
           name = "extra-${toString i}";
           inherit path;
-        }) cfg.extras
+        })
+        cfg.extras
       )
     );
   };
