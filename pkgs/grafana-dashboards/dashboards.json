@@ -29,6 +29,11 @@
     "revision": 3,
     "hash": "sha256-gpm/4rzcNv6br8L8cs9O6iWEScojfImWUi1uRXW8UpM="
   },
+  "prometheus-blackbox-exporter": {
+    "id": 14928,
+    "revision": 6,
+    "hash": "sha256-RkMZOh13umx+jVfhPVF1MeLnpjWM0NHIMvmZkilSkoY="
+  },
   "unpoller-uap-prometheus": {
     "id": 11314,
     "revision": 10,
