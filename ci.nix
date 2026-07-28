@@ -53,7 +53,11 @@ with builtins; let
 in rec {
   buildPkgs = filter isBuildable nurPkgs;
   cachePkgs = filter isCacheable buildPkgs;
+  # preferLocalBuild packages CI skips caching for (e.g. ableton-wine); build
+  # and `| cachix push <name>` these by hand after building locally
+  localPkgs = filter (p: !isCacheable p) buildPkgs;
 
   buildOutputs = concatMap outputsOf buildPkgs;
   cacheOutputs = concatMap outputsOf cachePkgs;
+  localOutputs = concatMap outputsOf localPkgs;
 }

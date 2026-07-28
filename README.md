@@ -70,3 +70,22 @@ nix build github:tetra-fox/nurpkgs#surge-dm
 
 > [!IMPORTANT]
 > `apple-color-emoji` and `pony-hyprcursors` are `unfreeRedistributable` (the latter is built on Hasbro IP). You'll need `allowUnfree` (or a predicate) on your nixpkgs config.
+
+## Binary cache
+
+CI pushes builds to [tetra-fox-nurpkgs.cachix.org](https://tetra-fox-nurpkgs.cachix.org). Add it as a substituter to pull prebuilt packages instead of building from source:
+
+```nix
+nix.settings = {
+  substituters = ["https://tetra-fox-nurpkgs.cachix.org"];
+  trusted-public-keys = ["tetra-fox-nurpkgs.cachix.org-1:UPmzw8DqV1QLd7YC58exrtKuPFo0JdmO+ywu34+zHiE="];
+};
+```
+
+or with the Cachix CLI: `cachix use tetra-fox-nurpkgs`.
+
+`ableton-wine` and `ableton-live` set `preferLocalBuild` and are excluded from the `Build` workflow's cache set (a from-source wine build is too heavy for that runner). The daily `Update flake inputs` workflow still builds and caches them when their pin moves, but after bumping and building locally (see `pkgs/ableton-wine/update.sh`) you can push right away instead of waiting for that cron:
+
+```sh
+nix-build ci.nix -A localOutputs | cachix push tetra-fox-nurpkgs
+```

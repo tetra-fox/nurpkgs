@@ -37,7 +37,18 @@ jobs:
           purge-created: 0
           purge-primary-key: never
 
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v17
+        with:
+          name: ${{ vars.CACHIX_CACHE_NAME }}
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
       - name: Build packages
         # cacheOutputs, not buildOutputs: it honors preferLocalBuild, which
-        # ableton-wine sets to keep its source wine build off the runner
-        run: nix-build ci.nix -A cacheOutputs
+        # ableton-wine sets to keep its source wine build off the runner.
+        # --arg pkgs pins to flake.lock's nixpkgs instead of NIX_PATH's live
+        # nixos-unstable tip, so this matches what `nix build .#x` resolves
+        # to and cachix pushed from a local flake build can be substituted
+        run: >
+          nix-build ci.nix -A cacheOutputs
+          --arg pkgs 'import (builtins.getFlake (toString ./.)).inputs.nixpkgs { system = builtins.currentSystem; }'
