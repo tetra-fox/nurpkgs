@@ -9,20 +9,20 @@
   # and its patches, winetricks plus payload cache, launcher scripts. one pin
   # shared with ableton-live via passthru. in an upstream in-tree flake this
   # becomes ./. with the version read from ./VERSION
-  version = "2026.07.19.2";
+  version = "2026.07.23.1";
   abletonLinux = fetchFromGitHub {
     owner = "shibco";
     repo = "ableton-linux";
     # main tip, not a release tag: kit content the packages ship can land
     # after the release commit that stamps VERSION. bump with update.sh and
     # build locally before pushing, CI does not build this package
-    rev = "02498675922c5c18b7a587eff6e3d7d9af53735b";
-    hash = "sha256-GEGhY7OzdERVsY4SKGi8oqqqE7cXmZKXaOY+kW6Kqg8=";
+    rev = "e8c4363f0032ab1b5e07f4cc2c2393a158c2bab6";
+    hash = "sha256-0OgRrvoBHvS+iOIyVqd3ThGYyewD1lrXpw0wU1YYqIs=";
   };
   pipeasioVersion = "1.2.2";
   pwLib = lib.getLib pipewire;
 in
-  # nixpkgs base wine (11.12 infra, same generation as the 11.11 fork base)
+  # nixpkgs base wine (11.12 infra, one point release off the 11.13 fork base)
   # already enables everything upstream's ubuntu container provides: alsa
   # (winealsa midi), pulse, gnutls, dbus, udev, freetype, fontconfig,
   # x11/gl/vulkan, and libusb via usbSupport for the push 2 bridge. wayland is
@@ -33,13 +33,14 @@ in
     pname = "ableton-wine";
     inherit version;
 
-    # giang17's wine-11.11 plus the d2d1-dcomp squash, the exact base the
-    # series applies to (upstream vendors it as vendor/wine-base-7ea0c8b7.tar.zst)
+    # giang17's d2d1-dcomp-11.13 branch, the exact base the series applies to
+    # (upstream vendors it as vendor/wine-base-5c23dd1c.tar.zst); upstream
+    # bumped 11.11 -> 11.13 on 2026-07-21
     src = fetchFromGitHub {
       owner = "giang17";
       repo = "wine";
-      rev = "7ea0c8b7dd0a183db07af23fe9f7a5006b2ddde8";
-      hash = "sha256-0x5VuWJg4F0IyyRXsZ1rEZqN49DW6i6GzTYcEepERjs=";
+      rev = "5c23dd1cf66550608df3a0b598269628e917e8e8";
+      hash = "sha256-uLxVe0lxHsxHktKeVchjoeOk1FZAU65/0qh7nJXZV1A=";
     };
 
     # keep nixpkgs' own patches (cert-path); the series applies after, driven

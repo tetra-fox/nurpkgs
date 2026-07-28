@@ -90,7 +90,7 @@ in
       # ABLETON_WINE_ROOT still overrides
       for f in $share/scripts/ableton-live $share/scripts/setup-prefix.sh; do
         substituteInPlace $f --replace-fail \
-          'WINE_ROOT="''${ABLETON_WINE_ROOT:-$HOME/.local/opt/wine-d2d1-nspa-11.11}"' \
+          'WINE_ROOT="''${ABLETON_WINE_ROOT:-$HOME/.local/opt/wine-d2d1-nspa-11.13}"' \
           'WINE_ROOT="''${ABLETON_WINE_ROOT:-${ableton-wine}}"'
       done
       substituteInPlace $share/scripts/ableton-live \
