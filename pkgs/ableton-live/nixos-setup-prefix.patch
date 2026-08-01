@@ -1,6 +1,6 @@
 --- a/scripts/setup-prefix.sh
 +++ b/scripts/setup-prefix.sh
-@@ -294,7 +294,12 @@
+@@ -295,7 +295,12 @@
      tmpc=""
      if [ -d "$root/vendor/winetricks-cache" ]; then
          tmpc="$(mktemp -d)"
@@ -14,7 +14,7 @@
          export XDG_CACHE_HOME="$tmpc"
          echo "   using bundled winetricks cache ($root/vendor/winetricks-cache)"
      fi
-@@ -459,8 +464,8 @@
+@@ -574,8 +579,8 @@
  "$WINESERVER" -w
  
  echo "== [4/5] register packaged PipeASIO =="
@@ -25,13 +25,13 @@
  # Pre-2026-07 runtimes shipped WineASIO; drop its registration and the stale
  # system32 placeholders so nothing references the removed driver. Harmless on
  # fresh prefixes.
-@@ -493,6 +498,11 @@
+@@ -608,6 +613,11 @@
    wine reg add 'HKCU\Software\Wine\X11 Driver' \
      /v FileDialogPortal /t REG_SZ /d auto /f
  fi
-+# this build ships wine's ffmpeg (winedmo) media backend instead of
-+# winegstreamer; mfsrcsnk only uses its own sources when the gst handler is
-+# disabled. without this, live cannot import mp3/aac/m4a
++# nixpkgs wine ships ffmpeg (winedmo), not winegstreamer; mfsrcsnk only uses
++# its own winedmo sources when the gst byte stream handler is disabled. without
++# this, live cannot import mp3/aac/m4a
 +# (MFCreateSourceReaderFromURL fails with MF_E_UNSUPPORTED_BYTESTREAM_TYPE)
 +wine reg add 'HKCU\Software\Wine\MediaFoundation' /v DisableGstByteStreamHandler /t REG_DWORD /d 1 /f
  push2_key='HKCU\Software\Wine\AppDefaults\Push2DisplayProcess.exe\DllOverrides'

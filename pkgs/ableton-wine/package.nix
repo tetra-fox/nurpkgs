@@ -9,15 +9,15 @@
   # and its patches, winetricks plus payload cache, launcher scripts. one pin
   # shared with ableton-live via passthru. in an upstream in-tree flake this
   # becomes ./. with the version read from ./VERSION
-  version = "2026.07.29.1";
+  version = "2026.08.01.1";
   abletonLinux = fetchFromGitHub {
     owner = "shibco";
     repo = "ableton-linux";
     # main tip, not a release tag: kit content the packages ship can land
     # after the release commit that stamps VERSION. bump with update.sh and
     # build locally before pushing, CI does not build this package
-    rev = "841215692788c2b69140175d044b096ab3bab028";
-    hash = "sha256-QlHjv5hF9eEKpCEOaEYI3GH+TSQgaZht2xXmP8uaLs8=";
+    rev = "925c43a45177ce37c99a109a532496d4910ad0c8";
+    hash = "sha256-+FD4EP9KjMQ/CDtSLk2VJqb3Aq2SXXZTx7FWO+Gdolw=";
   };
   pipeasioVersion = "1.2.2";
   pwLib = lib.getLib pipewire;
@@ -27,7 +27,11 @@ in
   # (winealsa midi), pulse, gnutls, dbus, udev, freetype, fontconfig,
   # x11/gl/vulkan, and libusb via usbSupport for the push 2 bridge. wayland is
   # also on, which upstream lacks (xwayland-only container); the driver stays
-  # dormant while DISPLAY is set. gstreamer is off in both.
+  # dormant while DISPLAY is set.
+  # media: nixpkgs base ships ffmpegSupport, so mp3/video decode through wine's
+  # winedmo (ffmpeg) demuxer, wine's own strategic replacement for the
+  # winegstreamer backend upstream still uses. the prefix routes mfsrcsnk to it
+  # with DisableGstByteStreamHandler=1 (nixos-setup-prefix.patch).
   # pe side: nixpkgs mingw instead of upstream's clang/lld.
   wineWow64Packages.unstable.overrideAttrs (old: {
     pname = "ableton-wine";
