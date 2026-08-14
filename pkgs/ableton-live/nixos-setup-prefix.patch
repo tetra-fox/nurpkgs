@@ -1,7 +1,7 @@
 --- a/scripts/setup-prefix.sh
 +++ b/scripts/setup-prefix.sh
-@@ -295,7 +295,12 @@
-     tmpc=""
+@@ -684,7 +684,12 @@
+     fi
      if [ -d "$root/vendor/winetricks-cache" ]; then
          tmpc="$(mktemp -d)"
 -        ln -s "$root/vendor/winetricks-cache" "$tmpc/winetricks"
@@ -14,18 +14,7 @@
          export XDG_CACHE_HOME="$tmpc"
          echo "   using bundled winetricks cache ($root/vendor/winetricks-cache)"
      fi
-@@ -574,8 +579,8 @@
- "$WINESERVER" -w
- 
- echo "== [4/5] register packaged PipeASIO =="
--ldconfig -p 2>/dev/null | grep -F 'libpipewire-0.3.so.0' >/dev/null || \
--  echo "!! host libpipewire-0.3.so.0 not found; install pipewire (0.3.56 or newer, 1.6+ recommended)"
-+# no host libpipewire check here: the packaged pipeasio resolves it through
-+# its nix store rpath, and nixos has no ld.so cache for ldconfig -p to read
- # Pre-2026-07 runtimes shipped WineASIO; drop its registration and the stale
- # system32 placeholders so nothing references the removed driver. Harmless on
- # fresh prefixes.
-@@ -608,6 +613,11 @@
+@@ -1034,6 +1039,11 @@
    wine reg add 'HKCU\Software\Wine\X11 Driver' \
      /v FileDialogPortal /t REG_SZ /d auto /f
  fi

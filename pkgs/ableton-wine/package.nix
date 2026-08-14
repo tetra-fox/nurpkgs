@@ -4,22 +4,25 @@
   wineWow64Packages,
   pipewire,
   llvmPackages,
+  cmake,
+  ninja,
+  pkg-config,
 }: let
   # shibco/ableton-linux is the kit: the wine patch series, vendored pipeasio
   # and its patches, winetricks plus payload cache, launcher scripts. one pin
   # shared with ableton-live via passthru. in an upstream in-tree flake this
   # becomes ./. with the version read from ./VERSION
-  version = "2026.08.04.1";
+  version = "2026.08.14.2";
   abletonLinux = fetchFromGitHub {
     owner = "shibco";
     repo = "ableton-linux";
     # main tip, not a release tag: kit content the packages ship can land
     # after the release commit that stamps VERSION. bump with update.sh and
     # build locally before pushing, CI does not build this package
-    rev = "d8d293ced633dd0e525d55838e94e8a55b6d86c7";
-    hash = "sha256-POacgIEWxgmUJ02snfo5GZY7rQrVOmlt/uvYC1n7sAc=";
+    rev = "b89f904ba8c7c932b721a864ce2301b93678b4b6";
+    hash = "sha256-V+asGCPxBDgi6UN+xsSHhJ9MtY9n7K39f/W0Ri6DJww=";
   };
-  pipeasioVersion = "1.2.2";
+  pipeasioVersion = "1.5.0";
   pwLib = lib.getLib pipewire;
 in
   # nixpkgs base wine (11.12 infra, one point release off the 11.13 fork base)
@@ -103,49 +106,67 @@ in
     # llvm-readobj for the push 2 export gate below
     nativeBuildInputs = old.nativeBuildInputs ++ [llvmPackages.llvm];
 
-    # pipeasio is versioned and shipped as one runtime with this wine upstream;
-    # build it here with this wine's own winegcc/winebuild (container-build.sh
-    # step [4/8]), then port the build gates. each gate exists because the
-    # regression it catches shipped silently at least once, see the upstream
-    # script and notes/
+    # pipeasio is versioned and shipped as one runtime with this wine upstream.
+    # 1.5 moved to a cmake build (its cmake/WineDLL.cmake drives this wine's
+    # winebuild/winegcc); build it here mirroring container-build.sh step [4/8].
+    # the settings panel (native qt6, not used inside wine) and ctest are off,
+    # driver only. then the ported build gates, each catching a regression that
+    # shipped silently at least once, see the upstream script and notes/
     postInstall =
       (old.postInstall or "")
       + ''
-        echo "== build pipeasio ${pipeasioVersion} against this wine =="
+        echo "== build pipeasio ${pipeasioVersion} against this wine (cmake) =="
         mkdir pipeasio
         tar xzf ${abletonLinux}/vendor/pipeasio-${pipeasioVersion}.tar.gz -C pipeasio --strip-components=1
         pushd pipeasio
         for p in ${abletonLinux}/patches/pipeasio/*.patch; do
           patch -p1 --no-backup-if-mismatch < "$p"
         done
-        export PATH="$out/bin:$PATH"
-        mkdir build64
-        for f in asio audio config main regsvr; do
-          cc -c -o build64/$f.o src/$f.c \
-            -Iinclude \
-            -I${lib.getDev pipewire}/include/pipewire-0.3 \
-            -I${lib.getDev pipewire}/include/spa-0.2 \
-            -I$out/include -I$out/include/wine -I$out/include/wine/windows \
-            -D_REENTRANT -Wall -pipe -fno-strict-aliasing -Wwrite-strings \
-            -Wpointer-arith -Werror=implicit-function-declaration \
-            -fPIC -O2 -DNDEBUG -fvisibility=hidden
-        done
-        winebuild -m64 --dll --fake-module -E pipeasio.dll.spec build64/*.o -o build64/pipeasio64.dll
-        # the unix half records DT_NEEDED libpipewire-0.3.so.0 and resolves it
-        # through the store rpath; upstream's no-rpath assertion is an
-        # ubuntu-container concern and does not apply here
-        winegcc -shared pipeasio.dll.spec build64/*.o \
-          -L${pwLib}/lib -Wl,-rpath,${pwLib}/lib \
-          -lodbc32 -lole32 -luuid -lwinmm -luser32 -lpipewire-0.3 \
-          -o build64/pipeasio64.dll.so
-        # wine resolves the builtin by its spec name pipeasio.dll and looks for
-        # the unix half under that name too; without both names LoadLibrary
-        # fails with STATUS_DLL_NOT_FOUND
-        install -m644 build64/pipeasio64.dll    $out/lib/wine/x86_64-windows/pipeasio64.dll
-        install -m644 build64/pipeasio64.dll.so $out/lib/wine/x86_64-unix/pipeasio64.dll.so
-        install -m644 build64/pipeasio64.dll    $out/lib/wine/x86_64-windows/pipeasio.dll
-        install -m644 build64/pipeasio64.dll.so $out/lib/wine/x86_64-unix/pipeasio.dll.so
+        # this wine's winegcc/winebuild first, then cmake/ninja by path (kept
+        # out of nativeBuildInputs so their setup hooks never hijack wine's
+        # autotools configurePhase). WineDLL finds wine headers from $out/include
+        export PATH="$out/bin:${cmake}/bin:${ninja}/bin:${pkg-config}/bin:$PATH"
+        export PKG_CONFIG_PATH="${lib.getDev pipewire}/lib/pkgconfig''${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+        cmake -S . -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX="$out" \
+          -DWINEBUILD="$out/bin/winebuild" \
+          -DWINEGCC="$out/bin/winegcc" \
+          -DBUILD_SETTINGS_PANEL=OFF \
+          -DBUILD_TESTS=OFF \
+          -DCMAKE_EXE_LINKER_FLAGS="-Wl,--allow-shlib-undefined"
+        cmake --build build -j''${NIX_BUILD_CORES:-4}
+        cmake --install build
         popd
+        # WineDLL installs pipeasio64.dll(.so) plus the pipeasio.dll(.so) symlink
+        # aliases wine resolves the builtin by. cmake links libpipewire by soname
+        # (pkg-config) but embeds no rpath; nixos has no ld.so cache, so add the
+        # store rpath to the real unix file (the symlink alias follows it)
+        patchelf --add-rpath ${pwLib}/lib $out/lib/wine/x86_64-unix/pipeasio64.dll.so
+
+        # pipewire-version-probe: a native linux client the kit's setup-prefix
+        # runs from $WINE_ROOT/bin to preflight the host pipewire before
+        # registering pipeasio. plain gcc against nixpkgs pipewire, store rpath
+        # (nixos has no ld.so cache; upstream's container forbids rpath because
+        # it resolves against the host, the opposite constraint)
+        echo "== build pipewire-version-probe =="
+        cc ${abletonLinux}/tools/pipewire-version-probe.c \
+          $(pkg-config --cflags libpipewire-0.3) \
+          -lpipewire-0.3 -L${pwLib}/lib -Wl,-rpath,${pwLib}/lib \
+          -O2 -o $out/bin/pipewire-version-probe
+
+        # sealed-runtime manifest the kit's setup-prefix requires and validates
+        # (lib/pipeasio.sh): the pipeasio/probe sha256s it re-checks at setup,
+        # plus the panel state (we build driver-only, panel disabled)
+        echo "== stamp ABLETON-WINE-BUILD-INFO.txt =="
+        {
+          echo "dist-version: ${version}"
+          echo "pipeasio-pe: $(sha256sum $out/lib/wine/x86_64-windows/pipeasio64.dll | awk '{print $1}')"
+          echo "pipeasio-unix: $(sha256sum $out/lib/wine/x86_64-unix/pipeasio64.dll.so | awk '{print $1}')"
+          echo "pipewire-version-probe: $(sha256sum $out/bin/pipewire-version-probe | awk '{print $1}')"
+          echo "pipeasio-panel: skipped"
+          echo "pipeasio-settings: skipped (disabled)"
+        } > $out/ABLETON-WINE-BUILD-INFO.txt
 
         echo "== build gates (container-build.sh [3/8] + [4/8]) =="
         # configure silently drops winealsa without alsa-lib; that means no

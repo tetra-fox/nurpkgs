@@ -37,6 +37,9 @@ if [ -n "$installer" ] && [ ! -f "$installer" ]; then
 fi
 
 export PATH="@setupPath@:$PATH"
+# setup-prefix.sh sources config.sh, which only defaults ABLETON_WINE_ROOT when
+# unset; point it at the store runtime (an explicit env value still wins)
+export ABLETON_WINE_ROOT="${ABLETON_WINE_ROOT:-@abletonWine@}"
 bash "@shareDir@/scripts/setup-prefix.sh" ${setup_args[@]+"${setup_args[@]}"}
 
 [ -n "$installer" ] || exit 0

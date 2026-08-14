@@ -16,6 +16,7 @@
   unzip,
   util-linux,
   wget,
+  xdg-user-dirs,
 }: let
   # tools the launcher shells out to on every start. desktop probes (hyprctl,
   # gsettings, xrdb) stay ambient on purpose, the scripts treat them as optional
@@ -26,6 +27,7 @@
     gnused
     procps
     util-linux
+    xdg-user-dirs # xdg-user-dir DESKTOP, for the .desktop refresh
   ];
   # setup-prefix.sh + winetricks host tools; wget covers verbs whose payload
   # is not in the vendored cache (mfc42 for live 12)
@@ -41,6 +43,7 @@
     unzip
     util-linux
     wget
+    xdg-user-dirs
   ];
   # icon extraction plus the shell tools the entry generator uses
   desktopEntriesPath = lib.makeBinPath [
@@ -76,29 +79,45 @@ in
 
       install -m755 scripts/ableton-live scripts/setup-prefix.sh $share/scripts/
       install -m644 scripts/detect-scale.sh scripts/detect-theme.sh $share/scripts/
-      # prebuilt PE helper, runs under wine: repaints live's top bar mid-session
-      # on theme change. shipped as-is like upstream's kit does
-      install -m644 tools/setsyscolors.exe $share/scripts/
-      # only the pieces setup-prefix.sh resolves from the kit root; the rest of
+      # the launcher and setup source these helper libs. both resolve them
+      # relative to their own dir first ($here/lib), so installing beside the
+      # scripts is enough; config.sh drives the ABLETON_* env contract
+      install -m644 scripts/lib/*.sh -Dt $share/scripts/lib
+      # prebuilt PE helpers that run under wine: setsyscolors repaints live's
+      # top bar on theme change, learnheal reloads a wedged learn view. plus the
+      # gnome shortcut-hold helper (has a launcher-dir fallback, so shipping it
+      # beside the launcher is enough) and ableton-linkctl (opt-in link control).
+      # all runtime-optional; shipped for parity with upstream's install
+      install -m644 tools/setsyscolors.exe tools/learnheal.exe $share/scripts/
+      install -m755 scripts/shortcut-hold.sh scripts/ableton-linkctl $share/scripts/
+      # setup-prefix installs these into the prefix to repair max for live's font
+      # fallback (M4L devices name macOS fonts; max's last resort is bitstream
+      # vera, which no modern distro ships), fixing an M4L load hang
+      mkdir -p $share/vendor/fonts
+      cp -r vendor/fonts/bitstream-vera $share/vendor/fonts/
+      # the pieces setup-prefix.sh resolves from the kit root; the rest of
       # vendor/ (wine base tarball, pipeasio, sdk debs) is build input for
       # ableton-wine, not runtime material
       install -m755 vendor/winetricks $share/vendor/
       cp -r vendor/winetricks-cache $share/vendor/
 
-      # the launcher and setup script default to the ~/.local layout of
-      # upstream's install.sh; point them at the store instead. an explicit
-      # ABLETON_WINE_ROOT still overrides
-      for f in $share/scripts/ableton-live $share/scripts/setup-prefix.sh; do
-        substituteInPlace $f --replace-fail \
-          'WINE_ROOT="''${ABLETON_WINE_ROOT:-$HOME/.local/opt/wine-d2d1-nspa-11.13}"' \
-          'WINE_ROOT="''${ABLETON_WINE_ROOT:-${ableton-wine}}"'
-      done
+      # setup-prefix.sh finds its libs and detect scripts relative to $here
+      # (the store), so it needs no rewriting. the launcher, though, reads the
+      # detect scripts and setsyscolors from $ABLETON_DATA_HOME (a writable user
+      # dir in the upstream install.sh model); point those at the store copies
       substituteInPlace $share/scripts/ableton-live \
-        --replace-fail '"$HOME/.local/share/ableton-wine/detect-scale.sh"' "\"$share/scripts/detect-scale.sh\"" \
-        --replace-fail '"$HOME/.local/share/ableton-wine/detect-theme.sh"' "\"$share/scripts/detect-theme.sh\"" \
-        --replace-fail '"$HOME/.local/share/ableton-wine/setsyscolors.exe"' "\"$share/scripts/setsyscolors.exe\""
+        --replace-fail '"$ABLETON_DATA_HOME/detect-scale.sh"' "\"$share/scripts/detect-scale.sh\"" \
+        --replace-fail '"$ABLETON_DATA_HOME/detect-theme.sh"' "\"$share/scripts/detect-theme.sh\"" \
+        --replace-fail '"$ABLETON_DATA_HOME/setsyscolors.exe"' "\"$share/scripts/setsyscolors.exe\"" \
+        --replace-fail '"$ABLETON_DATA_HOME/learnheal.exe"' "\"$share/scripts/learnheal.exe\"" \
+        --replace-fail '"$ABLETON_DATA_HOME/ableton-linkctl"' "\"$share/scripts/ableton-linkctl\""
 
+      # config.sh only defaults ABLETON_WINE_ROOT when unset, so the wrapper's
+      # value wins; an explicit ABLETON_WINE_ROOT in the environment still
+      # overrides. ABLETON_DATA_HOME stays the user default (writable: link
+      # state, ableton-linkd), since the store copies are wired in above
       makeWrapper $share/scripts/ableton-live $out/bin/ableton-live \
+        --set-default ABLETON_WINE_ROOT ${ableton-wine} \
         --prefix PATH : ${launcherPath}
 
       install -m755 ${./ableton-live-desktop-entries.sh} $out/bin/ableton-live-desktop-entries
@@ -113,13 +132,26 @@ in
         --subst-var-by abletonWine ${ableton-wine} \
         --subst-var-by desktopEntries "$out/bin/ableton-live-desktop-entries"
 
-      # Path= would hardcode a home directory the store cannot know; the
-      # launcher does not depend on its cwd
-      for d in ableton-live wine-protocol-ableton; do
-        sed -e "s#@HOME@/.local/bin/ableton-live#$out/bin/ableton-live#" \
-            -e '/^Path=/d' \
+      # static menu entry + the ableton:// and .auz handlers. @BIN@ -> our bin;
+      # drop Path=@PREFIX@ (the store cannot know the wine prefix, and the
+      # launcher does not depend on its cwd). generic name/icon/wmclass here;
+      # ableton-live-desktop-entries overwrites with real per-edition icons
+      # after Live installs
+      for d in ableton-live ableton-linux-protocol ableton-linux-auz; do
+        sed -e "s#@BIN@#$out/bin#g" \
+            -e 's#@NAME@#Ableton Live#g' \
+            -e 's#@ICON@#ableton-live#g' \
+            -e 's#@WMCLASS@#ableton live 12 suite.exe#g' \
+            -e '/^Path=@PREFIX@/d' \
             desktop/$d.desktop.in > $out/share/applications/$d.desktop
       done
+
+      # file-type integration: the .auz MIME definition and the scalable icons
+      # for the edition entries and the live document types (.als/.adg/.adv...),
+      # so file managers show the right icons and .auz opens through the handler
+      install -Dm644 desktop/x-wine-extension-auz.xml -t $out/share/mime/packages
+      mkdir -p $out/share/icons/hicolor
+      cp -r desktop/icons/scalable $out/share/icons/hicolor/
 
       runHook postInstall
     '';
