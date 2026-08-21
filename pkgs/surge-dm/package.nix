@@ -7,16 +7,16 @@
 }:
 buildGoModule (finalAttrs: {
   pname = "surge-dm";
-  version = "0.11.2";
+  version = "0.12.0";
 
   src = fetchFromGitHub {
     owner = "SurgeDM";
     repo = "Surge";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-N25JU3uuXr8SGNeoo0JSL0+8rGaYeQ3lWZxn+aXkJIg=";
+    hash = "sha256-8AhG0GL85CYuaqAAdkcrQoC0gL7Petnpt2ONwyGTiLI=";
   };
 
-  vendorHash = "sha256-uZrSOcwfXJ9LwuHi+0wIjPBIsAdULU60GbWrJNV923s=";
+  vendorHash = "sha256-5iS75LoN9FC57XRAbIU+Pia1gcXyeiF7bqF3pndYXwM=";
 
   # test suite is ~2min of stress tests; not worth running on every rebuild
   doCheck = false;
