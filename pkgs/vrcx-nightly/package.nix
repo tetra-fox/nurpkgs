@@ -13,14 +13,15 @@
   makeDesktopItem,
   copyDesktopItems,
 }: let
-  # package.json engines wants node >= 24, the csproj targets net9.0.
+  # package.json engines wants node >= 24, the csproj targets net10.0.
   # upstream pins electron ^40 as a devDependency (type defs + electron-builder),
   # but the runtime electron is passed explicitly to electron-builder below, so we
   # run a supported line instead. 40 is EOL; 42 ships the same node 24.17 / N-API 10
   # as 41 so the precompiled node-api-dotnet addon loads unchanged, just newer chromium
   node = nodejs_24;
   electron = electron_42;
-  dotnet = dotnetCorePackages.dotnet_9;
+  dotnet = dotnetCorePackages.dotnet_10;
+  rid = dotnetCorePackages.systemToDotnetRid stdenv.hostPlatform.system;
 in
   buildNpmPackage (finalAttrs: let
     backend = buildDotnetModule {
@@ -30,9 +31,15 @@ in
       dotnet-sdk = dotnet.sdk;
       dotnet-runtime = dotnet.runtime;
       projectFile = "Dotnet/VRCX-Electron.csproj";
+      # Dotnet/Directory.Build.props errors out when Platform is left at the
+      # AnyCPU default, upstream passes the arch half of the rid
+      dotnetBuildFlags = ["-p:Platform=${lib.last (lib.splitString "-" rid)}"];
 
       nugetDeps = ./deps.json;
 
+      # keeps the csproj's build/Electron/<rid>/ layout. main.js only loads the
+      # flat path when app.isPackaged, which is false under the stock electron
+      # binary
       installPhase = ''
         runHook preInstall
 
@@ -67,19 +74,19 @@ in
     # the app writes to its Version file and shows as the running version, and
     # main.js keys nightly detection off the trailing 7 char hash, so we pin the
     # tagged nightly commit and reuse the tag verbatim. see update.sh
-    version = "2026-08-01T10.15-949651e";
+    version = "2026-09-28T12.56-962ff8e";
 
     src = fetchFromGitHub {
       owner = "vrcx-team";
       repo = "VRCX";
-      rev = "949651edc4b470a6c22889a661d146105b4ffe3a";
-      hash = "sha256-D0RRl7fGiowSsQMCqoU6xbq+HkzgxKvcemdaZsf2Un8=";
+      rev = "962ff8ed05623e1bb5160a5ea525690aaa45beeb";
+      hash = "sha256-aXpqzUnl1/3pWskmAtvw1D0R9XhlFZfHzeS/RR/4VNo=";
     };
 
     nodejs = node;
     makeCacheWritable = true;
     npmFlags = ["--ignore-scripts"];
-    npmDepsHash = "sha256-rvY4Px4AdDm2vXxqRdlLCCJRKym7n7actGzCaP5mmGQ=";
+    npmDepsHash = "sha256-fFuqtISueODEFzuqWWL3aG4DWbrq2G4dHsXi3RWByjY=";
 
     nativeBuildInputs = [
       makeWrapper
@@ -96,21 +103,22 @@ in
       echo -n "${finalAttrs.version}" > Version
     '';
 
-    # mirrors the linux path of upstream's own scripts: prod-linux (vite
-    # build plus license manifest), then build-electron minus the dotnet
-    # runtime download (nix provides the runtime via DOTNET_ROOT), then
-    # the postbuild asar path fixup. rename-builds.js is skipped, it only
-    # renames release artifacts for upload
+    # mirrors upstream's own scripts: prod (vite build plus license
+    # manifest), then build-electron minus the dotnet runtime download (nix
+    # provides the runtime via DOTNET_ROOT), then the postbuild asar path
+    # fixup. rename-builds.js is skipped, it only renames release artifacts
+    # for upload
     buildPhase = ''
       runHook preBuild
 
-      env PLATFORM=linux npm exec vite build src
+      npm exec vite build src
       NUGET_PACKAGES=${nugetLicenseCache} node ./build-scripts/generate-third-party-licenses.js
-      node ./src-electron/patch-package-version.js
+      node ./build-scripts/patch-package-version.js
       npm exec electron-builder -- --dir \
+        --config electron-builder.config.js \
         -c.electronDist=${electron.dist} \
         -c.electronVersion=${electron.version}
-      node ./src-electron/patch-node-api-dotnet.js
+      node ./build-scripts/patch-node-api-dotnet.js
 
       runHook postBuild
     '';
