@@ -46,18 +46,18 @@
   },
   {
     "pname": "Microsoft.JavaScript.NodeApi",
-    "version": "0.9.21",
-    "hash": "sha256-t1fujoh70TKqoWQpjSq9Pq9Wk557KKle5W9lHVxrgzA="
+    "version": "0.9.27",
+    "hash": "sha256-EHHOKbKPGRGbENH5h27G5vKmjPnDtw4jFe4SG46nbsw="
   },
   {
     "pname": "Microsoft.JavaScript.NodeApi.Generator",
-    "version": "0.9.21",
-    "hash": "sha256-zlfkByJBFn3SRHyAaOXHmk7lUc0HZtdsMrtisqx2zOo="
+    "version": "0.9.27",
+    "hash": "sha256-3eFft8UBUrtPUHz2+zq8x1staIos1ZKrUyl3zB2o3C0="
   },
   {
     "pname": "Microsoft.Win32.SystemEvents",
-    "version": "10.0.10",
-    "hash": "sha256-WURA2NISoZzDBDMH7YnJcc/iI47inqJJtHMj40HhVJE="
+    "version": "10.0.12",
+    "hash": "sha256-bQYUMa+kocicO7+FNtGRcYGrbJrOLFxmenfYFDS7N2k="
   },
   {
     "pname": "Newtonsoft.Json",
@@ -66,8 +66,8 @@
   },
   {
     "pname": "NLog",
-    "version": "6.1.4",
-    "hash": "sha256-76h0KhYh0B6NDrkV5MHhv8SqUSvhTF6CFKsao5nRBbQ="
+    "version": "6.2.1",
+    "hash": "sha256-xKUn24ZEhMugwRTl8nbaPzjCBtElQXyZr7pBknwUkWc="
   },
   {
     "pname": "runtime.native.System.Data.SqlClient.sni",
@@ -116,8 +116,8 @@
   },
   {
     "pname": "System.CodeDom",
-    "version": "10.0.10",
-    "hash": "sha256-xmuoa7ejwrNsha6hXLm0zsagGrUsoCe8Dd+5xFiNWvI="
+    "version": "10.0.12",
+    "hash": "sha256-/s+6urTkKH633q56Ivof+Rm7HlDHWmm1B7J4/tyYLtg="
   },
   {
     "pname": "System.CodeDom",
@@ -156,13 +156,13 @@
   },
   {
     "pname": "System.Drawing.Common",
-    "version": "10.0.10",
-    "hash": "sha256-kHJHgIhFa9+HN86in89Y2NDxy5Cz/r2sSOguFQhXKt0="
+    "version": "10.0.12",
+    "hash": "sha256-kuTRMA/YSNqA0tlpOdOtKH5bp1dyqeZ3H1M1LfvbCz8="
   },
   {
     "pname": "System.Management",
-    "version": "10.0.10",
-    "hash": "sha256-FAyMQ6ouxpt5/tdVv62lNp/3hiUbV8uAI4YoKMmj2oE="
+    "version": "10.0.12",
+    "hash": "sha256-VAs9VkvwrunCnOSvBPxUJKZthd4/9Fj+HrEZGd5bsCU="
   },
   {
     "pname": "System.Reactive",
@@ -191,7 +191,7 @@
   },
   {
     "pname": "Websocket.Client",
-    "version": "5.5.0",
-    "hash": "sha256-TY4ITkBMH+JEVwTUrZdFV5bCzCVLZGCgBlgunTaPIQM="
+    "version": "5.5.1",
+    "hash": "sha256-62SVSwPsGGVyAE+EGDzAKpNzePn1jxJtIo0swRSt1rQ="
   }
 ]
