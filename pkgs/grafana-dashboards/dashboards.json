@@ -21,8 +21,8 @@
   },
   "zfs-pool-performance-and-health": {
     "id": 24987,
-    "revision": 2,
-    "hash": "sha256-Rg1cj2eBkN+/jWpuCF37JNAFA/2Pygk3JrbRe8rNFco="
+    "revision": 8,
+    "hash": "sha256-U4YlHI7tYWh3W2tNxK4gpandpDbkeFakEKJhucIeyUo="
   },
   "smartctl-exporter-dashboard": {
     "id": 22604,
