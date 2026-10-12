@@ -26,8 +26,8 @@
   },
   "smartctl-exporter-dashboard": {
     "id": 22604,
-    "revision": 3,
-    "hash": "sha256-gpm/4rzcNv6br8L8cs9O6iWEScojfImWUi1uRXW8UpM="
+    "revision": 4,
+    "hash": "sha256-ah36BdFIcaprUz39hRzuYVzfp3diEBckmalMaOls5kY="
   },
   "prometheus-blackbox-exporter": {
     "id": 14928,
