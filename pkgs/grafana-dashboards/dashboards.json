@@ -16,8 +16,8 @@
   },
   "nvidia-gpu": {
     "id": 14574,
-    "revision": 17,
-    "hash": "sha256-w4sipSh/ndrJ/PQIVXJ1xhkcpZADELpdBlBa8fOfVyE="
+    "revision": 18,
+    "hash": "sha256-tuvm63s/svcc15DikhT94M5exnscMfQCehbqOBX7GGk="
   },
   "zfs-pool-performance-and-health": {
     "id": 24987,
