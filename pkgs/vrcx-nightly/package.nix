@@ -6,20 +6,15 @@
   buildDotnetModule,
   dotnetCorePackages,
   nodejs_24,
-  electron_42,
+  electron_43,
   runCommand,
   unzip,
   makeWrapper,
   makeDesktopItem,
   copyDesktopItems,
 }: let
-  # package.json engines wants node >= 24, the csproj targets net10.0.
-  # upstream pins electron ^40 as a devDependency (type defs + electron-builder),
-  # but the runtime electron is passed explicitly to electron-builder below, so we
-  # run a supported line instead. 40 is EOL; 42 ships the same node 24.17 / N-API 10
-  # as 41 so the precompiled node-api-dotnet addon loads unchanged, just newer chromium
   node = nodejs_24;
-  electron = electron_42;
+  electron = electron_43;
   dotnet = dotnetCorePackages.dotnet_10;
   rid = dotnetCorePackages.systemToDotnetRid stdenv.hostPlatform.system;
 in
