@@ -69,19 +69,19 @@ in
     # the app writes to its Version file and shows as the running version, and
     # main.js keys nightly detection off the trailing 7 char hash, so we pin the
     # tagged nightly commit and reuse the tag verbatim. see update.sh
-    version = "2026-10-26T08.30-0678985";
+    version = "2026-11-07T16.36-4a63d57";
 
     src = fetchFromGitHub {
       owner = "vrcx-team";
       repo = "VRCX";
-      rev = "0678985e6ddeb43155359f0d9b978b81a6f9cef4";
-      hash = "sha256-YS8ef/0mwKHSyTN7kCsYQ/v1C9UojOvhBbmXrmyqAiA=";
+      rev = "4a63d579fe8f4c16a2b528a326d2ac5265b9c2db";
+      hash = "sha256-z9fNb/KmD3oWH1dvJkolv5oV+zLdlOEuMdX3PG0576c=";
     };
 
     nodejs = node;
     makeCacheWritable = true;
     npmFlags = ["--ignore-scripts"];
-    npmDepsHash = "sha256-3qGFbe/uJz5SCrAbUKK6oRBrqj5RArVCpR5LGyPFPgA=";
+    npmDepsHash = "sha256-K+m5LwMkGEC6Zpuzk8zxolsT6HFfgCYZDU/AxX05o4A=";
 
     nativeBuildInputs = [
       makeWrapper
