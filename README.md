@@ -73,19 +73,19 @@ nix build github:tetra-fox/nurpkgs#surge-dm
 
 ## Binary cache
 
-CI pushes builds to [tetra-fox-nurpkgs.cachix.org](https://tetra-fox-nurpkgs.cachix.org). Add it as a substituter to pull prebuilt packages instead of building from source:
+CI pushes builds to [tetra-fox.cachix.org](https://tetra-fox.cachix.org). Add it as a substituter to pull prebuilt packages instead of building from source:
 
 ```nix
 nix.settings = {
-  substituters = ["https://tetra-fox-nurpkgs.cachix.org"];
-  trusted-public-keys = ["tetra-fox-nurpkgs.cachix.org-1:UPmzw8DqV1QLd7YC58exrtKuPFo0JdmO+ywu34+zHiE="];
+  substituters = ["https://tetra-fox.cachix.org"];
+  trusted-public-keys = ["tetra-fox.cachix.org-1:l70MnHbfeZm2unwKH47I42/imLanZMMSxJbqoS0FvEs="];
 };
 ```
 
-or with the Cachix CLI: `cachix use tetra-fox-nurpkgs`.
+or with the Cachix CLI: `cachix use tetra-fox`.
 
 `ableton-wine` and `ableton-live` set `preferLocalBuild` and are excluded from the `Build` workflow's cache set (a from-source wine build is too heavy for that runner). The daily `Update flake inputs` workflow still builds and caches them when their pin moves, but after bumping and building locally (see `pkgs/ableton-wine/update.sh`) you can push right away instead of waiting for that cron:
 
 ```sh
-nix-build ci.nix -A localOutputs | cachix push tetra-fox-nurpkgs
+nix-build ci.nix -A localOutputs | cachix push tetra-fox
 ```
