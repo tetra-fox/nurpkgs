@@ -3,6 +3,7 @@
 ## Packages
 
 - `surge-dm` — [Surge](https://github.com/SurgeDM/Surge), a TUI download manager
+- `kdl-lsp` - [kdl-lsp](https://github.com/kdl-org/kdl-rs), the LSP server for [KDL](https://kdl.dev)
 - `vrcx-nightly` — [VRCX](https://github.com/vrcx-team/VRCX) built from the latest master commit
 - `apple-color-emoji` — Apple Color Emoji repacked for Linux (via [samuelngs/apple-emoji-ttf](https://github.com/samuelngs/apple-emoji-ttf))
 - `pony-hyprcursors` — vectorized hyprcursor builds of [Sullindir's MLP pony cursor packs](https://www.deviantart.com/sullindir/gallery); the original `.ani` files are bundled and converted to svg pixel grids at build time. Each pony installs to `share/icons/<Name>` (Rainbow-Dash, Rainbow-Dash-Alternate, Applejack, Fluttershy, Pinkie-Pie, Rarity, Twilight-Sparkle, Princess-Luna, Octavia, Derpy-Hooves, Vinyl-Scratch, Discord, Queen-Chrysalis); pick one with `hyprctl setcursor <Name> <size>`
